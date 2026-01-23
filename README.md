@@ -16,6 +16,8 @@ A Node.js script to extract direct download links from redirect pages (e.g. fuck
 
 2. Ensure you have your list of redirect URLs in `page-links.txt` in the root directory. The file should contain one URL per line.
 
+   > **Tip:** You can use [Fitgirl-Easy-Downloader](https://github.com/JoyNath1337/Fitgirl-Easy-Downloader?tab=readme-ov-file#get-direct-download-links) to generate this list of links in the correct format.
+
 ## Usage
 
 Run the extractor script:
@@ -35,6 +37,15 @@ The script will:
 Limit the number of links to process (useful for testing):
 ```bash
 node extractor.js --limit 10
+```
+
+Set concurrency (parallel pages, default 1):
+```bash
+node extractor.js --concurrency 5
+```
+Combine options:
+```bash
+node extractor.js --limit 20 --concurrency 5
 ```
 
 ## Troubleshooting
