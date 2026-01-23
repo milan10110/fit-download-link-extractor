@@ -1,0 +1,12 @@
+{
+  "name": "fitgirl-link-finder",
+  "version": "1.0.0",
+  "description": "Extracts download links from fitgirl-repacks redirect pages",
+  "main": "extractor.js",
+  "scripts": {
+    "start": "node extractor.js"
+  },
+  "dependencies": {
+    "puppeteer": "^24.1.0"
+  }
+}
