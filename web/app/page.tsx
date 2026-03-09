@@ -155,7 +155,7 @@ export default function Home() {
             FitGirl Link Extractor
           </h1>
           <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-            Paste your FitGirl page links below to automatically extract the direct download URLs. Easy, fast, and clutter-free.
+            Paste FitGirl fast download page links below to automatically extract the direct download URLs. Easy, fast, and clutter-free.
           </p>
         </div>
 
@@ -176,7 +176,20 @@ export default function Home() {
                 <Label htmlFor="input-links" className="sr-only">Input Links</Label>
                 <Textarea
                   id="input-links"
-                  placeholder="https://example.com/page1&#10;https://example.com/page2"
+                  placeholder={
+`https://fuckingfast.co/vkoe5x#NFSMW_--_fitgirl-repacks.site_--_.part1.rar
+https://fuckingfast.co/e46tei#NFSMW_--_fitgirl-repacks.site_--_.part2.rar
+https://fuckingfast.co/isp94n#NFSMW_--_fitgirl-repacks.site_--_.part3.rar
+https://fuckingfast.co/tmc5ro#NFSMW_--_fitgirl-repacks.site_--_.part4.rar
+https://fuckingfast.co/w3kjay#NFSMW_--_fitgirl-repacks.site_--_.part5.rar
+https://fuckingfast.co/0j6ct9#setup-fitgirl-selective-english.bin
+https://fuckingfast.co/8f04o7#setup-fitgirl-selective-french.bin
+https://fuckingfast.co/pz5oic#setup-fitgirl-selective-german.bin
+https://fuckingfast.co/vyiehk#setup-fitgirl-selective-italian.bin
+https://fuckingfast.co/hjstg4#setup-fitgirl-selective-japanese.bin
+https://fuckingfast.co/d24lpe#setup-fitgirl-selective-russian.bin
+https://fuckingfast.co/cdh3pi#setup-fitgirl-selective-spanish.bin`
+                  }
                   className="h-[300px] overflow-y-auto resize-none font-mono text-sm bg-background/50 focus-visible:ring-primary"
                   value={links}
                   onChange={(e) => setLinks(e.target.value)}
