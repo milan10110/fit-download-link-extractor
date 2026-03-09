@@ -1,5 +1,8 @@
-import puppeteer from 'puppeteer';
 import { NextResponse } from 'next/server';
+import puppeteerCore from 'puppeteer-core';
+import chromium from '@sparticuz/chromium';
+
+export const maxDuration = 60; // Allow Vercel functions to run for 60 seconds
 
 // Queue generic processor
 async function processQueue(items: string[], concurrency: number, workerFn: (item: string, index: number) => Promise<{ url?: string; filename?: string; error?: string }>) {
@@ -57,10 +60,24 @@ export async function POST(req: Request) {
         }
 
         console.log(`Found ${links.length} links to process. Concurrency: ${concurrency}`);
-        const browser = await puppeteer.launch({
-            headless: true,
-            args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage']
-        });
+        let browser;
+        
+        // Use local puppeteer if we're in development or not on Vercel
+        if (process.env.NODE_ENV === 'development' || !process.env.VERCEL) {
+             const puppeteer = require('puppeteer');
+             browser = await puppeteer.launch({
+                headless: true,
+                args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage']
+             });
+        } else {
+             // Production on Vercel
+             browser = await puppeteerCore.launch({
+                args: chromium.args,
+                executablePath: await chromium.executablePath(),
+                headless: true,
+             });
+             console.log("USING VERCEL CHROMIUM");
+        }
 
         // Worker function for each link
         const worker = async (link: string, i: number): Promise<{ url?: string; filename?: string; error?: string }> => {
