@@ -1,8 +1,34 @@
 import { NextResponse } from 'next/server';
-import puppeteerCore from 'puppeteer-core';
-import chromium from '@sparticuz/chromium';
 
 export const maxDuration = 60; // Allow Vercel functions to run for 60 seconds
+
+// URL to the Chromium binary package hosted in /public
+// Vercel injects VERCEL_PROJECT_PRODUCTION_URL automatically during deployment
+const CHROMIUM_PACK_URL = process.env.VERCEL_PROJECT_PRODUCTION_URL
+  ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}/chromium-pack.tar`
+  : null;
+
+// Cache the executable path across warm invocations
+let cachedExecutablePath: string | null = null;
+let downloadPromise: Promise<string> | null = null;
+
+async function getChromiumPath(): Promise<string> {
+  if (cachedExecutablePath) return cachedExecutablePath;
+  if (!downloadPromise) {
+    const chromium = (await import('@sparticuz/chromium-min')).default;
+    downloadPromise = chromium
+      .executablePath(CHROMIUM_PACK_URL!)
+      .then((path) => {
+        cachedExecutablePath = path;
+        return path;
+      })
+      .catch((err) => {
+        downloadPromise = null;
+        throw err;
+      });
+  }
+  return downloadPromise;
+}
 
 // Queue generic processor
 async function processQueue(items: string[], concurrency: number, workerFn: (item: string, index: number) => Promise<{ url?: string; filename?: string; error?: string }>) {
@@ -61,22 +87,26 @@ export async function POST(req: Request) {
 
         console.log(`Found ${links.length} links to process. Concurrency: ${concurrency}`);
         let browser;
-        
-        // Use local puppeteer if we're in development or not on Vercel
-        if (process.env.NODE_ENV === 'development' || !process.env.VERCEL) {
-             const puppeteer = require('puppeteer');
-             browser = await puppeteer.launch({
+        const isVercel = !!process.env.VERCEL_ENV;
+
+        if (isVercel) {
+            // Production on Vercel: fetch chromium from /public at runtime
+            const chromium = (await import('@sparticuz/chromium-min')).default;
+            const puppeteerCore = await import('puppeteer-core');
+            const executablePath = await getChromiumPath();
+            browser = await puppeteerCore.launch({
+                args: chromium.args,
+                executablePath,
+                headless: true,
+            });
+            console.log('USING VERCEL CHROMIUM');
+        } else {
+            // Local development: use regular puppeteer
+            const puppeteer = (await import('puppeteer')).default;
+            browser = await puppeteer.launch({
                 headless: true,
                 args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage']
-             });
-        } else {
-             // Production on Vercel
-             browser = await puppeteerCore.launch({
-                args: chromium.args,
-                executablePath: await chromium.executablePath(),
-                headless: true,
-             });
-             console.log("USING VERCEL CHROMIUM");
+            });
         }
 
         // Worker function for each link
