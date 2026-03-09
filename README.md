@@ -1,6 +1,6 @@
-# Fitgirl Download Link Finder
+# FitGirl Download Link Extractor
 
-A Node.js script to extract direct download links from redirect pages (e.g. fuckingfast.co) typically found on Repack sites.
+A modern Web App and Node.js script to extract direct download links from redirect pages (e.g. fuckingfast.co) typically found on FitGirl Repack sites.
 
 ## Prerequisites
 
